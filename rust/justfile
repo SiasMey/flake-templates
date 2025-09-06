@@ -1,0 +1,11 @@
+help:
+    @just --list
+
+lint:
+    echo "lint tools"
+
+test:
+    echo "run tests"
+
+build:
+    echo "run build"
