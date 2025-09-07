@@ -2,11 +2,24 @@ help:
     @just --list
 
 lint:
-    uv run ruff format --check
     uv run ruff check
+    uv run ruff format --check
     uv run basedpyright
 
 fmt:
     uv run ruff check --select I --fix --exit-zero
-    uv run ruff check --fix --exit-zero
     uv run ruff format
+
+test:
+    uv run pytest
+
+build:
+    nix build
+
+run:
+    nix run
+
+setup-project name="name-of-project":
+    sed -i '/name-of-project/{{ name }}/g' flake.nix
+    sed -i '/name-of-project/{{ name }}/g' pyproject.toml
+    sed -i '/mod-of-project/{{ replace(name, "-", "_") }}/g' pyproject.toml

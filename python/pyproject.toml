@@ -4,12 +4,15 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Sias Mey", email = "siasmey@gmail.com" }]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = []
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = ["mod_of_project"]
 
 [dependency-groups]
-dev = ["basedpyright>=1.31.3", "ruff>=0.12.10"]
+dev = ["basedpyright", "ruff", "pytest"]

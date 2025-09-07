@@ -29,6 +29,7 @@
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
+        inherit (nixpkgs) lib;
         pkgs = import nixpkgs {inherit system;};
         python = pkgs.python313;
 
@@ -43,7 +44,7 @@
         };
 
         # 3. Placeholder for Your Custom Package Overrides
-        myCustomOverrides = final: prev: {
+        projectCustomOverrides = final: prev: {
           /*
           e.g., some-package = prev.some-package.overridePythonAttrs (...);
           */
@@ -54,7 +55,7 @@
           .overrideScope (nixpkgs.lib.composeManyExtensions [
           pyproject-build-systems.overlays.default # For build tools
           uvLockedOverlay # Your locked dependencies
-          myCustomOverrides # Your fixes
+          projectCustomOverrides # Your fixes
         ]);
 
         # --- This is where your project's metadata is accessed ---
@@ -71,25 +72,15 @@
         devShells.default = pkgs.mkShell {
           packages = [appPythonEnv pkgs.uv pkgs.zlib];
           shellHook = ''/* Your custom shell hooks */ '';
+          env =
+            {}
+            // lib.optionalAttrs pkgs.stdenv.isLinux {
+              LD_LIBRARY_PATH = lib.makeLibraryPath pkgs.pythonManylinuxPackages.manylinux1;
+            };
         };
 
         # Nix Package for Your Application
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = thisProjectAsNixPkg.pname;
-          version = thisProjectAsNixPkg.version;
-          src = ./.; # Source of your main script
-
-          nativeBuildInputs = [pkgs.makeWrapper];
-          buildInputs = [appPythonEnv]; # Runtime Python environment
-
-          installPhase = ''
-            mkdir -p $out/bin
-            cp main.py $out/bin/${thisProjectAsNixPkg.pname}-script
-            chmod +x $out/bin/${thisProjectAsNixPkg.pname}-script
-            makeWrapper ${appPythonEnv}/bin/python $out/bin/${thisProjectAsNixPkg.pname} \
-              --add-flags $out/bin/${thisProjectAsNixPkg.pname}-script
-          '';
-        };
+        packages.default = pythonSet.mkVirtualEnv (thisProjectAsNixPkg.pname + "-env") workspace.deps.default;
         packages.${thisProjectAsNixPkg.pname} = self.packages.${system}.default;
 
         # App for `nix run`
