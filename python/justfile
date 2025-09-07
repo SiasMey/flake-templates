@@ -20,6 +20,6 @@ run:
     nix run
 
 setup-project name="name-of-project":
-    sed -i '/name-of-project/{{ name }}/g' flake.nix
+    sed -i '/throw "name-of-project"/"{{ name }}"/g' flake.nix
     sed -i '/name-of-project/{{ name }}/g' pyproject.toml
     sed -i '/mod-of-project/{{ replace(name, "-", "_") }}/g' pyproject.toml

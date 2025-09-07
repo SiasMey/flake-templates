@@ -1,5 +1,5 @@
 {
-  description = "Create summary of packages to be bumped in a uv project";
+  description = "Python project based on UV";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -59,7 +59,7 @@
         ]);
 
         # --- This is where your project's metadata is accessed ---
-        projectNameInToml = throw "name-of-project"; # MUST match [project.name] in pyproject.toml!
+        projectNameInToml = throw "name-of-project";
         thisProjectAsNixPkg = pythonSet.${projectNameInToml};
 
         # 5. Create the Python Runtime Environment
